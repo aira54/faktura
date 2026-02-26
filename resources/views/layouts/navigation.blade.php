@@ -40,6 +40,16 @@
                         <x-nav-link :href="route('invoices.index')"
                                     :active="request()->routeIs('invoices.*')">
                             {{ __('Invoices') }}
+
+                            <x-nav-link :href="route('settings.bank')"
+            :active="request()->routeIs('settings.bank')">
+    {{ __('Pengaturan Bank') }}
+</x-nav-link>
+
+<x-nav-link :href="route('settings.template')"
+            :active="request()->routeIs('settings.template')">
+    {{ __('Template Pesan') }}
+</x-nav-link>
                         </x-nav-link>
 
                     @endif

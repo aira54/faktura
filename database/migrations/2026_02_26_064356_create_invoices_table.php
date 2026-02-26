@@ -19,7 +19,8 @@ return new class extends Migration
                   ->constrained()
                   ->cascadeOnDelete();
 
-           $table->string('invoice_number');
+$table->string('invoice_number');
+$table->unique(['business_id', 'invoice_number']);
             $table->date('issue_date');
             $table->date('due_date');
 

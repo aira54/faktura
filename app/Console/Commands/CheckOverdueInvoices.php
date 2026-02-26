@@ -12,8 +12,7 @@ class CheckOverdueInvoices extends Command
      * The name and signature of the console command.
      *
      * @var string
-     */
-    protected $signature = 'app:check-overdue-invoices';
+     */protected $signature = 'invoices:check-overdue';
 
     /**
      * The console command description.

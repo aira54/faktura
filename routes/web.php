@@ -1,43 +1,75 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\AdminDashboardController;
+
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Controllers
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
+*/
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\BankSettingController;
+use App\Http\Controllers\MessageTemplateController;
+use App\Http\Controllers\Admin\AdminDashboardController;
+
+/*
+|--------------------------------------------------------------------------
+| Public
+|--------------------------------------------------------------------------
 */
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| Tenant (User)
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/admin-test', function () {
-    return "Admin Area";
-})->middleware(['auth', 'admin']);
+Route::middleware(['auth', 'verified'])->group(function () {
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-Route::middleware(['auth'])->group(function () {
-    Route::resource('customers', \App\Http\Controllers\CustomerController::class);
+    // Dashboard
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+
+    // Customers
+    Route::resource('customers', CustomerController::class);
+
+    // Invoices
+    Route::resource('invoices', InvoiceController::class);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Settings (Tenant)
+    |--------------------------------------------------------------------------
+    */
+
+    // Bank Setting
+    Route::get('/settings/bank', [BankSettingController::class, 'edit'])
+        ->name('settings.bank');
+
+    Route::post('/settings/bank', [BankSettingController::class, 'update'])
+        ->name('settings.bank.update');
+
+    // Message Template
+    Route::get('/settings/template', [MessageTemplateController::class, 'edit'])
+        ->name('settings.template');
+
+    Route::post('/settings/template', [MessageTemplateController::class, 'update'])
+        ->name('settings.template.update');
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::resource('invoices', \App\Http\Controllers\InvoiceController::class);
-});
+/*
+|--------------------------------------------------------------------------
+| Admin
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
@@ -45,16 +77,19 @@ Route::middleware(['auth', 'admin'])
     ->group(function () {
 
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-             ->name('dashboard');
-    });
-
-    Route::middleware(['auth', 'admin'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
-
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
     });
+
+/*
+|--------------------------------------------------------------------------
+| Profile
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
 
 require __DIR__.'/auth.php';

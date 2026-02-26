@@ -2,10 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Business;
-use App\Models\Customer;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Invoice extends Model
 {
@@ -32,7 +30,7 @@ class Invoice extends Model
     }
 
     public function items()
-{
-    return $this->hasMany(InvoiceItem::class);
-}
+    {
+        return $this->hasMany(InvoiceItem::class);
+    }
 }
