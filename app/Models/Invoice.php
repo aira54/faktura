@@ -51,4 +51,4 @@ class Invoice extends Model
     return 'unpaid';
 }
 }
-}
+
