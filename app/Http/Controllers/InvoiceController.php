@@ -155,3 +155,4 @@ public function whatsapp(Invoice $invoice)
     return redirect()->away($waUrl);
 }
 }
+}

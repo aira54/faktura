@@ -3,39 +3,46 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Invoice;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $businessId = auth()->user()->business_id;
+        $business = auth()->user()->business;
 
-        // Total semua invoice
-        $totalInvoices = Invoice::where('business_id', $businessId)->count();
+        // KPI
+        $totalInvoices = $business->invoices()->count();
 
-        // Invoice paid
-        $paidInvoices = Invoice::where('business_id', $businessId)
+        $paidInvoices = $business->invoices()
             ->where('status', 'paid')
             ->count();
 
-        // Invoice unpaid (sent + overdue)
-        $unpaidInvoices = Invoice::where('business_id', $businessId)
-            ->whereIn('status', ['sent', 'overdue'])
+        $unpaidInvoices = $business->invoices()
+            ->whereIn('status', ['draft','sent','overdue'])
             ->count();
 
-        // Total revenue (hanya yang paid)
-        $totalRevenue = Invoice::where('business_id', $businessId)
-            ->where('status', 'paid')
+        $totalRevenue = $business->invoices()
+            ->where('status','paid')
             ->sum('total_amount');
 
-        // Monthly revenue (berdasarkan issue_date)
-        $monthlyRevenue = Invoice::where('business_id', $businessId)
-            ->where('status', 'paid')
+        // Revenue per bulan
+        $monthlyRevenue = $business->invoices()
+            ->where('status','paid')
             ->selectRaw('MONTH(issue_date) as month, SUM(total_amount) as total')
             ->groupBy('month')
-            ->orderBy('month')
+            ->pluck('total','month');
+
+        // Status Chart
+        $statusData = $business->invoices()
+            ->select('status', DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total','status');
+
+        // Recent
+        $recentInvoices = $business->invoices()
+            ->latest()
+            ->take(5)
             ->get();
 
         return view('user.dashboard', compact(
@@ -43,7 +50,9 @@ class DashboardController extends Controller
             'paidInvoices',
             'unpaidInvoices',
             'totalRevenue',
-            'monthlyRevenue'
+            'monthlyRevenue',
+            'statusData',
+            'recentInvoices'
         ));
     }
 }
