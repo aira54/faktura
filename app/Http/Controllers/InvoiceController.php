@@ -48,7 +48,6 @@ class InvoiceController extends Controller
 
         DB::transaction(function () use ($businessId, $customer, $request) {
 
-            // 🔥 Ambil nomor terbesar dengan lock
             $lastInvoice = Invoice::where('business_id', $businessId)
                 ->lockForUpdate()
                 ->orderByRaw("CAST(SUBSTRING(invoice_number, 5) AS UNSIGNED) DESC")
@@ -63,14 +62,12 @@ class InvoiceController extends Controller
 
             $invoiceNumber = 'INV-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-            // Hitung total
             $total = 0;
 
             foreach ($request->items as $item) {
                 $total += $item['quantity'] * $item['price'];
             }
 
-            // Simpan invoice
             $invoice = Invoice::create([
                 'business_id'   => $businessId,
                 'customer_id'   => $customer->id,
@@ -78,10 +75,9 @@ class InvoiceController extends Controller
                 'issue_date'    => $request->issue_date,
                 'due_date'      => $request->due_date,
                 'total_amount'  => $total,
-                'status'        => 'draft',
+                'status'        => 'draft', // tetap draft saat dibuat
             ]);
 
-            // Simpan item
             foreach ($request->items as $item) {
                 $invoice->items()->create([
                     'description' => $item['description'],
@@ -92,6 +88,70 @@ class InvoiceController extends Controller
             }
         });
 
-        return redirect()->route('invoices.index');
+        return redirect()->route('app.invoices.index');
     }
+
+
+    // 🔥 METHOD KIRIM INVOICE
+    public function send(Invoice $invoice)
+    {
+        $user = Auth::user();
+
+        // Pastikan invoice milik business yang login
+        if ($invoice->business_id !== $user->business_id) {
+            abort(403);
+        }
+
+        // Hanya draft yang bisa dikirim
+        if ($invoice->status !== 'draft') {
+            return redirect()->route('app.invoices.index');
+        }
+
+        $invoice->update([
+            'status' => 'unpaid',
+        ]);
+
+        return redirect()->route('app.invoices.index');
+    }
+
+public function whatsapp(Invoice $invoice)
+{
+    $user = Auth::user();
+
+    if ($invoice->business_id !== $user->business_id) {
+        abort(403);
+    }
+
+    $customer = $invoice->customer;
+
+    if (!$customer || !$customer->phone) {
+        abort(500, 'Nomor customer belum diisi.');
+    }
+
+    $template = \App\Models\MessageTemplate::where(
+        'business_id',
+        $user->business_id
+    )->first();
+
+    if (!$template || empty($template->template)) {
+        abort(500, 'Template pesan belum dibuat.');
+    }
+
+    $message = $template->template;
+
+    $message = str_replace('{customer}', $customer->name, $message);
+    $message = str_replace('{invoice_number}', $invoice->invoice_number, $message);
+    $message = str_replace('{total}', number_format($invoice->total_amount, 0, ',', '.'), $message);
+    $message = str_replace('{due_date}', \Carbon\Carbon::parse($invoice->due_date)->format('d M Y'), $message);
+
+    $phone = preg_replace('/[^0-9]/', '', $customer->phone);
+
+    if (substr($phone, 0, 1) === '0') {
+        $phone = '62' . substr($phone, 1);
+    }
+
+    $waUrl = 'https://wa.me/' . $phone . '?text=' . rawurlencode($message);
+
+    return redirect()->away($waUrl);
+}
 }

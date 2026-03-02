@@ -3,7 +3,7 @@
 
         <h2 class="text-xl font-bold mb-4">Create Invoice</h2>
 
-        <form method="POST" action="{{ route('invoices.store') }}" class="space-y-6">
+       <form method="POST" action="{{ route('app.invoices.store') }}" class="space-y-6">
             @csrf
 
             <!-- Customer -->

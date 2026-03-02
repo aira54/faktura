@@ -53,48 +53,54 @@
 
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-            // Revenue Chart
-            var revenueOptions = {
-                chart: {
-                    type: 'area',
-                    height: 300,
-                    toolbar: {
-                        show: false
-                    }
-                },
-                series: [{
-                    name: 'Revenue',
-                    data: {!! json_encode(array_values($monthlyRevenue->toArray())) !!}
-                }],
-                xaxis: {
-                    categories: {!! json_encode(array_keys($monthlyRevenue->toArray())) !!}
-                },
-                colors: ['#3B82F6'],
-                stroke: {
-                    curve: 'smooth'
-                }
-            };
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
 
-            new ApexCharts(document.querySelector("#revenueChart"), revenueOptions).render();
+                // Revenue Chart
+                const revenueOptions = {
+                    chart: {
+                        type: 'area',
+                        height: 300,
+                        toolbar: { show: false }
+                    },
+                    series: [{
+                        name: 'Revenue',
+                        data: @json(array_values($monthlyRevenue->toArray()))
+                    }],
+                    xaxis: {
+                        categories: @json(array_keys($monthlyRevenue->toArray()))
+                    },
+                    colors: ['#3B82F6'],
+                    stroke: { curve: 'smooth' }
+                };
+
+                new ApexCharts(
+                    document.querySelector("#revenueChart"),
+                    revenueOptions
+                ).render();
 
 
-            // Status Chart
-            var statusOptions = {
-                chart: {
-                    type: 'donut',
-                    height: 300
-                },
-                series: [{{ $paidInvoices }}, {{ $unpaidInvoices }}],
-                labels: ['Paid', 'Unpaid'],
-                colors: ['#22C55E', '#EF4444']
-            };
+                // Status Chart
+                const statusOptions = {
+                    chart: {
+                        type: 'donut',
+                        height: 300
+                    },
+                    series: [{{ $paidInvoices }}, {{ $unpaidInvoices }}],
+                    labels: ['Paid', 'Unpaid'],
+                    colors: ['#22C55E', '#EF4444']
+                };
 
-            new ApexCharts(document.querySelector("#statusChart"), statusOptions).render();
+                new ApexCharts(
+                    document.querySelector("#statusChart"),
+                    statusOptions
+                ).render();
 
-        });
-    </script>
+            });
+        </script>
+    @endpush
 
 </x-app-layout>

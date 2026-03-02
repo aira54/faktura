@@ -2,12 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Controllers
-|--------------------------------------------------------------------------
-*/
-
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InvoiceController;
@@ -16,10 +10,9 @@ use App\Http\Controllers\MessageTemplateController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\User\DashboardController;
 
-
 /*
 |--------------------------------------------------------------------------
-| Public (Landing Page)
+| Public
 |--------------------------------------------------------------------------
 */
 
@@ -37,44 +30,35 @@ Route::middleware(['auth', 'verified'])
     ->name('app.')
     ->group(function () {
 
-        /*
-        |--------------------------------------------------------------------------
-        | Dashboard User (WAJIB PAKE CONTROLLER)
-        |--------------------------------------------------------------------------
-        */
-
+        // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Customers & Invoices
-        |--------------------------------------------------------------------------
-        */
-
+        // Customers
         Route::resource('customers', CustomerController::class);
+
+        // Invoices
         Route::resource('invoices', InvoiceController::class);
 
+        // 🔥 Kirim Invoice (ubah status draft -> unpaid)
+        Route::patch('invoices/{invoice}/send', [InvoiceController::class, 'send'])
+            ->name('invoices.send');
 
-        /*
-        |--------------------------------------------------------------------------
-        | Settings
-        |--------------------------------------------------------------------------
-        */
+        // 🔥 Kirim WhatsApp Manual
+        Route::get('invoices/{invoice}/whatsapp', [InvoiceController::class, 'whatsapp'])
+            ->name('invoices.whatsapp');
 
+        // Settings
         Route::prefix('settings')
             ->name('settings.')
             ->group(function () {
 
-                // Bank
                 Route::get('/bank', [BankSettingController::class, 'edit'])
                     ->name('bank.edit');
 
                 Route::put('/bank', [BankSettingController::class, 'update'])
                     ->name('bank.update');
 
-                // Template
                 Route::get('/template', [MessageTemplateController::class, 'edit'])
                     ->name('template.edit');
 

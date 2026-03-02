@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 
 class Invoice extends Model
 {
@@ -33,4 +34,21 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceItem::class);
     }
+
+    public function getComputedStatusAttribute()
+{
+    if ($this->status === 'paid') {
+        return 'paid';
+    }
+
+    if ($this->status === 'draft') {
+        return 'draft';
+    }
+
+    if (Carbon::today()->gt(Carbon::parse($this->due_date))) {
+        return 'overdue';
+    }
+
+    return 'unpaid';
+}
 }
