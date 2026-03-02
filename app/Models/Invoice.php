@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Invoice extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'business_id',
         'customer_id',
@@ -16,7 +14,7 @@ class Invoice extends Model
         'issue_date',
         'due_date',
         'total_amount',
-        'status',
+        'status'
     ];
 
     public function business()
@@ -24,12 +22,13 @@ class Invoice extends Model
         return $this->belongsTo(Business::class);
     }
 
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
 
-    public function items()
+   public function items()
     {
         return $this->hasMany(InvoiceItem::class);
     }

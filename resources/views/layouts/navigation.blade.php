@@ -7,10 +7,11 @@
             <div class="flex items-center">
 
                 <!-- Logo -->
-                <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('app.dashboard') }}">
-                    <div class="text-xl font-bold text-blue-600">
-                        Faktura
-                    </div>
+                <a href="{{ auth()->user()->role === 'admin' ? route('admin.dashboard') : route('app.dashboard') }}"
+                class="flex items-center">
+                    <img src="{{ asset('images/nav.png') }}"
+                        alt="Faktura Logo"
+                        class="h-9 w-auto hover:opacity-80 transition duration-200">
                 </a>
 
                 <!-- Desktop Menu -->
