@@ -27,38 +27,36 @@ class RegisteredUserController extends Controller
 
     /**
      * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+        $validated = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user = null;
+        $user = DB::transaction(function () use ($validated) {
 
-        DB::transaction(function () use ($request, &$user) {
-
-            // 1. Buat user
+            // 1️⃣ Buat user
             $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'name'     => $validated['name'],
+                'email'    => $validated['email'],
+                'password' => Hash::make($validated['password']),
             ]);
 
-            // 2. Buat business
+            // 2️⃣ Buat business (pakai user_id BUKAN owner_id)
             $business = Business::create([
-                'name' => $request->name . "'s Business",
-                'owner_id' => $user->id,
+                'name'    => $validated['name'] . "'s Business",
+                'user_id' => $user->id,
             ]);
 
-            // 3. Hubungkan user ke business
+            // 3️⃣ Update user dengan business_id
             $user->update([
                 'business_id' => $business->id,
             ]);
+
+            return $user;
         });
 
         event(new Registered($user));

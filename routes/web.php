@@ -17,25 +17,25 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 
 /*
 |--------------------------------------------------------------------------
-| Public
+| Public (Landing Page)
 |--------------------------------------------------------------------------
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('pages.landing'); 
+})->name('landing');
 
 /*
 |--------------------------------------------------------------------------
-| Tenant (User)
+| Tenant (User Area)
 |--------------------------------------------------------------------------
 */
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Dashboard
+    // Dashboard user
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        return view('pages.dashboard'); 
     })->name('dashboard');
 
     // Customers
@@ -46,7 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Settings (Tenant)
+    | Settings
     |--------------------------------------------------------------------------
     */
 
@@ -67,7 +67,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Admin
+| Admin Area
 |--------------------------------------------------------------------------
 */
 
