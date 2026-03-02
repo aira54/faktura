@@ -1,99 +1,100 @@
 <x-app-layout>
+    <div class="max-w-7xl mx-auto p-6 space-y-8">
 
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Dashboard Saya
-        </h2>
-    </x-slot>
+        <!-- Header -->
+        <div>
+            <h2 class="text-3xl font-bold text-gray-800">Dashboard</h2>
+            <p class="text-gray-500 mt-1">Ringkasan performa bisnis kamu</p>
+        </div>
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+        <!-- Statistik -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
-            <!-- ================= WELCOME ================= -->
-            <div class="bg-white p-6 rounded-xl shadow-sm">
-                <h3 class="text-lg font-semibold">
-                    Halo, {{ auth()->user()->name }} 👋
+            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                <p class="text-gray-500 text-sm">Total Invoice</p>
+                <h3 class="text-2xl font-bold mt-2">{{ $totalInvoices }}</h3>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                <p class="text-gray-500 text-sm">Invoice Paid</p>
+                <h3 class="text-2xl font-bold text-green-600 mt-2">{{ $paidInvoices }}</h3>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                <p class="text-gray-500 text-sm">Invoice Unpaid</p>
+                <h3 class="text-2xl font-bold text-red-500 mt-2">{{ $unpaidInvoices }}</h3>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                <p class="text-gray-500 text-sm">Total Revenue</p>
+                <h3 class="text-2xl font-bold text-blue-600 mt-2">
+                    Rp {{ number_format($totalRevenue, 0, ',', '.') }}
                 </h3>
-                <p class="text-sm text-gray-500 mt-1">
-                    Kelola customer, invoice, dan pembayaran bisnismu dengan mudah.
-                </p>
-            </div>
-
-            <!-- ================= QUICK ACTION ================= -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-                <a href="{{ route('customers.index') }}"
-                    class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
-                    <h3 class="font-semibold text-lg">👥 Customer</h3>
-                    <p class="text-sm text-gray-500 mt-2">
-                        Kelola daftar pelanggan kamu
-                    </p>
-                </a>
-
-                <a href="{{ route('invoices.index') }}"
-                    class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
-                    <h3 class="font-semibold text-lg">🧾 Invoice</h3>
-                    <p class="text-sm text-gray-500 mt-2">
-                        Buat & kirim invoice ke customer
-                    </p>
-                </a>
-
-                <a href="{{ route('bank-settings.index') }}"
-                    class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
-                    <h3 class="font-semibold text-lg">🏦 Pengaturan Bank</h3>
-                    <p class="text-sm text-gray-500 mt-2">
-                        Atur rekening pembayaran
-                    </p>
-                </a>
-
-                <a href="{{ route('message-templates.index') }}"
-                    class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
-                    <h3 class="font-semibold text-lg">💬 Template Pesan</h3>
-                    <p class="text-sm text-gray-500 mt-2">
-                        Buat template WhatsApp otomatis
-                    </p>
-                </a>
-
-            </div>
-
-            <!-- ================= RINGKASAN INVOICE ================= -->
-            <div class="grid md:grid-cols-3 gap-6">
-
-                <div class="bg-white p-6 rounded-xl shadow-sm">
-                    <p class="text-sm text-gray-500">Total Invoice</p>
-                    <h3 class="text-3xl font-bold mt-2">
-                        {{ $totalInvoices ?? 0 }}
-                    </h3>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm">
-                    <p class="text-sm text-gray-500">Invoice Paid</p>
-                    <h3 class="text-3xl font-bold mt-2 text-green-600">
-                        {{ $totalPaidInvoices ?? 0 }}
-                    </h3>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm">
-                    <p class="text-sm text-gray-500">Invoice Pending</p>
-                    <h3 class="text-3xl font-bold mt-2 text-yellow-500">
-                        {{ $totalPendingInvoices ?? 0 }}
-                    </h3>
-                </div>
-
-            </div>
-
-            <!-- ================= PAKET USER ================= -->
-            <div class="bg-gradient-to-r from-blue-500 to-green-500 p-6 rounded-xl text-white shadow-sm">
-                <h3 class="text-lg font-semibold">Paket Aktif</h3>
-                <p class="mt-2 text-sm opacity-90">
-                    Kamu menggunakan paket <strong>{{ $userPlan ?? 'Basic' }}</strong>
-                </p>
-                <p class="text-sm opacity-90 mt-1">
-                    Upgrade untuk menikmati fitur lebih lengkap 🚀
-                </p>
             </div>
 
         </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Revenue Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm lg:col-span-2">
+                <h3 class="font-semibold mb-4">Revenue Per Bulan</h3>
+                <div id="revenueChart"></div>
+            </div>
+
+            <!-- Status Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm">
+                <h3 class="font-semibold mb-4">Status Invoice</h3>
+                <div id="statusChart"></div>
+            </div>
+
+        </div>
+
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // Revenue Chart
+            var revenueOptions = {
+                chart: {
+                    type: 'area',
+                    height: 300,
+                    toolbar: {
+                        show: false
+                    }
+                },
+                series: [{
+                    name: 'Revenue',
+                    data: {!! json_encode(array_values($monthlyRevenue->toArray())) !!}
+                }],
+                xaxis: {
+                    categories: {!! json_encode(array_keys($monthlyRevenue->toArray())) !!}
+                },
+                colors: ['#3B82F6'],
+                stroke: {
+                    curve: 'smooth'
+                }
+            };
+
+            new ApexCharts(document.querySelector("#revenueChart"), revenueOptions).render();
+
+
+            // Status Chart
+            var statusOptions = {
+                chart: {
+                    type: 'donut',
+                    height: 300
+                },
+                series: [{{ $paidInvoices }}, {{ $unpaidInvoices }}],
+                labels: ['Paid', 'Unpaid'],
+                colors: ['#22C55E', '#EF4444']
+            };
+
+            new ApexCharts(document.querySelector("#statusChart"), statusOptions).render();
+
+        });
+    </script>
 
 </x-app-layout>

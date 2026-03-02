@@ -8,24 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('customers', function (Blueprint $table) {
-            $table->id();
-
+        Schema::table('customers', function (Blueprint $table) {
             $table->foreignId('business_id')
                   ->constrained()
                   ->cascadeOnDelete();
-
-            $table->string('name');
-            $table->string('email')->nullable();
-            $table->string('phone')->nullable();
-            $table->text('address')->nullable();
-
-            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('customers');
+        Schema::table('customers', function (Blueprint $table) {
+            $table->dropForeign(['business_id']);
+            $table->dropColumn('business_id');
+        });
     }
 };

@@ -47,8 +47,8 @@ class RegisteredUserController extends Controller
 
             // 2️⃣ Buat business (pakai user_id BUKAN owner_id)
             $business = Business::create([
-                'name'    => $validated['name'] . "'s Business",
-                'user_id' => $user->id,
+            'name' => $validated['name'] . "'s Business",
+            'owner_id' => $user->id,
             ]);
 
             // 3️⃣ Update user dengan business_id

@@ -2,53 +2,92 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
+use App\Models\Business;
+use App\Models\Invoice;
+use App\Models\Customer;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-  protected $fillable = [
-    'name',
-    'email',
-    'password',
-    'business_id',
-    'role',
-];
+    /*
+    |--------------------------------------------------------------------------
+    | Mass Assignable
+    |--------------------------------------------------------------------------
+    */
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'business_id',
+        'role',
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hidden Fields
+    |--------------------------------------------------------------------------
+    */
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Casts
+    |--------------------------------------------------------------------------
+    */
+
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-
     ];
-  public function business()
-{
-    return $this->belongsTo(Business::class);
-}
 
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
 
+    // User belongs to a Business (Multi-tenant)
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
+    }
+
+    // User has many Invoices
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    // User has many Customers
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Helper Methods
+    |--------------------------------------------------------------------------
+    */
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isUser()
+    {
+        return $this->role === 'user';
+    }
 }

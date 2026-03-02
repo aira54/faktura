@@ -3,7 +3,7 @@
 
         <h2 class="text-xl font-bold mb-4">Customer List</h2>
 
-        <form method="POST" action="{{ route('customers.store') }}" class="space-y-2 mb-6">
+        <form method="POST" action="{{ route('app.customers.store') }}" class="space-y-2 mb-6">
             @csrf
 
             <input type="text" name="name" placeholder="Name" required class="border p-2 w-full">
@@ -17,7 +17,7 @@
         </form>
 
         <div class="space-y-2">
-            @foreach($customers as $customer)
+            @foreach ($customers as $customer)
                 <div class="p-3 border rounded">
                     <strong>{{ $customer->name }}</strong><br>
                     <small>{{ $customer->email }}</small>
